@@ -4,36 +4,16 @@
 			<g class="vch__months__labels__wrapper" :transform="monthsLabelWrapperTransform">
 				<text
 					class="vch__month__label"
-					v-for="(month, index) in heatmap.firstFullWeekOfMonths"
+					v-for="(year, index) in heatmap.yearsToHaveInlabels"
 					:key="index"
-					:x="getMonthLabelPosition(month).x"
-					:y="getMonthLabelPosition(month).y"
+					:x="getYearLabelPosition(index).x"
+					:y="getYearLabelPosition(index).y"
 				>
-					{{ lo.months[ month.value ] }}
+					{{ year}}
 				</text>
 			</g>
 
-			<g class="vch__days__labels__wrapper" :transform="daysLabelWrapperTransform">
-				<text class="vch__day__label"
-					  :x="vertical ? SQUARE_SIZE : 0"
-					  :y="vertical ? SQUARE_SIZE - SQUARE_BORDER_SIZE : 20"
-				>
-					{{ lo.days[ 1 ] }}
-				</text>
-				<text class="vch__day__label"
-					  :x="vertical ? SQUARE_SIZE * 3 : 0"
-					  :y="vertical ? SQUARE_SIZE - SQUARE_BORDER_SIZE : 44"
-				>
-					{{ lo.days[ 3 ] }}
-				</text>
-				<text class="vch__day__label"
-					  :x="vertical ? SQUARE_SIZE * 5 : 0"
-					  :y="vertical ? SQUARE_SIZE - SQUARE_BORDER_SIZE : 69"
-				>
-					{{ lo.days[ 5 ] }}
-				</text>
-			</g>
-
+			<!-- legend that has more, less and a few squares -->
 			<g v-if="vertical" class="vch__legend__wrapper" :transform="legendWrapperTransform">
 				<text :x="SQUARE_SIZE * 1.25" y="8">{{ lo.less }}</text>
 				<rect
@@ -55,24 +35,26 @@
 				</text>
 			</g>
 
+			<!-- colored boxes region -->
 			<g class="vch__year__wrapper" :transform="yearWrapperTransform" @mouseover="initTippyLazy">
-				<g class="vch__month__wrapper"
-				   v-for="(week, weekIndex) in heatmap.calendar"
-				   :key="weekIndex"
-				   :transform="getWeekPosition(weekIndex)"
+				<g class="vch__slice__wrapper"
+				   v-for="(slice, sliceIndex) in heatmap.calendar"
+				   :key="sliceIndex"
+				   :transform="getSlicePosition(sliceIndex)"
 				>
-					<template v-for="(day, dayIndex) in week" :key="dayIndex">
+					<!-- outer index is a slice, inner index is an item-->
+					<template v-for="(item, itemIndex) in slice" :key="itemIndex">
 						<rect class="vch__day__square"
-							  v-if="day.date < now"
+							  v-if="item.date < now"
 							  :rx="round"
 							  :ry="round"
-							  :transform="getDayPosition(dayIndex)"
+							  :transform="getItemPosition(itemIndex)"
 							  :width="SQUARE_SIZE - SQUARE_BORDER_SIZE"
 							  :height="SQUARE_SIZE - SQUARE_BORDER_SIZE"
-							  :style="{ fill: curRangeColor[day.colorIndex] }"
-							  :data-week-index="weekIndex"
-							  :data-day-index="dayIndex"
-							  @click="$emit('dayClick', day)"
+							  :style="{ fill: curRangeColor[item.colorIndex] }"
+							  :data-slice-index="sliceIndex"
+							  :data-item-index="itemIndex"
+							  @click="$emit('itemClick', item)"
 						/>
 					</template>
 				</g>
@@ -161,7 +143,7 @@
 			},
 			darkMode        : Boolean
 		},
-		emits: [ 'dayClick' ],
+		emits: [ 'itemClick' ],
 		setup(props) {
 
 			const SQUARE_BORDER_SIZE          = Heatmap.SQUARE_SIZE / 5,
@@ -205,41 +187,39 @@
 				}
 			}
 
-			function tooltipOptions(day: CalendarItem) {
+			function tooltipOptions(item: CalendarItem) {
 				if (props.tooltip) {
-					if (day.count !== undefined) {
+					if (item.count !== undefined) {
 						if (props.tooltipFormatter) {
-							return props.tooltipFormatter(day, props.tooltipUnit!);
+							return props.tooltipFormatter(item, props.tooltipUnit!);
 						}
-						return `<b>${day.count} ${props.tooltipUnit}</b> ${lo.value.on} ${lo.value.months[ day.date.getMonth() ]} ${day.date.getDate()}, ${day.date.getFullYear()}`;
-					} else if (props.noDataText) {
-						return `${props.noDataText}`;
+						return `<b>${item.count} ${props.tooltipUnit}</b> ${lo.value.on} ${lo.value.months[ item.date.getMonth() ]} ${item.date.getFullYear()}`;
 					} else if (props.noDataText !== false) {
-						return `<b>No ${props.tooltipUnit}</b> ${lo.value.on} ${lo.value.months[ day.date.getMonth() ]} ${day.date.getDate()}, ${day.date.getFullYear()}`;
+						return `<b>No ${props.tooltipUnit}</b> ${lo.value.on} ${lo.value.months[ item.date.getMonth() ]} ${item.date.getFullYear()}`;
 					}
 				}
 				return undefined;
 			}
 
-			function getWeekPosition(index: number) {
+			function getSlicePosition(index: number) {
 				if (props.vertical) {
-					return `translate(0, ${(SQUARE_SIZE * heatmap.value.weekCount) - ((index + 1) * SQUARE_SIZE)})`;
+					return `translate(0, ${(SQUARE_SIZE * heatmap.value.numSlices) - ((index + 1) * SQUARE_SIZE)})`;
 				}
 				return `translate(${index * SQUARE_SIZE}, 0)`;
 			}
 
-			function getDayPosition(index: number) {
+			function getItemPosition(index: number) {
 				if (props.vertical) {
 					return `translate(${index * SQUARE_SIZE}, 0)`;
 				}
 				return `translate(0, ${index * SQUARE_SIZE})`;
 			}
 
-			function getMonthLabelPosition(month: Month) {
+			function getYearLabelPosition(yearIndex: number) {
 				if (props.vertical) {
-					return { x: 3, y: (SQUARE_SIZE * heatmap.value.weekCount) - (SQUARE_SIZE * (month.index)) - (SQUARE_SIZE / 4) };
+					return { x: 0, y: (SQUARE_SIZE * heatmap.value.numSlices) - (SQUARE_SIZE * (yearIndex*2)) - (SQUARE_SIZE / 4) };
 				}
-				return { x: SQUARE_SIZE * month.index, y: SQUARE_SIZE - SQUARE_BORDER_SIZE };
+				return { x: SQUARE_SIZE * yearIndex * 2, y: SQUARE_SIZE - SQUARE_BORDER_SIZE };
 			}
 
 			watch([ toRef(props, 'rangeColor'), toRef(props, 'darkMode') ], ([ rc, dm ]) => {
@@ -248,13 +228,13 @@
 
 			watch(vertical, v => {
 				if (v) {
-					width.value                       = LEFT_SECTION_WIDTH + (SQUARE_SIZE * Heatmap.DAYS_IN_WEEK) + RIGHT_SECTION_WIDTH;
-					height.value                      = TOP_SECTION_HEIGHT + (SQUARE_SIZE * heatmap.value.weekCount) + SQUARE_BORDER_SIZE;
+					width.value                       = LEFT_SECTION_WIDTH + (SQUARE_SIZE * Heatmap.MONTHS_IN_ROW) + RIGHT_SECTION_WIDTH;
+					height.value                      = TOP_SECTION_HEIGHT + (SQUARE_SIZE * heatmap.value.numSlices) + SQUARE_BORDER_SIZE;
 					daysLabelWrapperTransform.value   = `translate(${LEFT_SECTION_WIDTH}, 0)`;
 					monthsLabelWrapperTransform.value = `translate(0, ${TOP_SECTION_HEIGHT})`;
 				} else {
-					width.value                       = LEFT_SECTION_WIDTH + (SQUARE_SIZE * heatmap.value.weekCount) + SQUARE_BORDER_SIZE;
-					height.value                      = TOP_SECTION_HEIGHT + (SQUARE_SIZE * Heatmap.DAYS_IN_WEEK);
+					width.value                       = LEFT_SECTION_WIDTH + (SQUARE_SIZE * heatmap.value.numSlices) + SQUARE_BORDER_SIZE;
+					height.value                      = TOP_SECTION_HEIGHT + (SQUARE_SIZE * Heatmap.MONTHS_IN_ROW);
 					daysLabelWrapperTransform.value   = `translate(0, ${TOP_SECTION_HEIGHT})`;
 					monthsLabelWrapperTransform.value = `translate(${LEFT_SECTION_WIDTH}, 0)`;
 				}
@@ -263,7 +243,7 @@
 			watch([ width, height ], ([ w, h ]) => (viewbox.value = ` 0 0 ${w} ${h}`), { immediate: true });
 			watch([ width, height, rangeColor ], ([ w, h, rc ]) => {
 				legendWrapperTransform.value = vertical.value
-					? `translate(${LEFT_SECTION_WIDTH + (SQUARE_SIZE * Heatmap.DAYS_IN_WEEK)}, ${TOP_SECTION_HEIGHT})`
+					? `translate(${LEFT_SECTION_WIDTH + (SQUARE_SIZE * Heatmap.MONTHS_IN_ROW)}, ${TOP_SECTION_HEIGHT})`
 					: `translate(${w - (SQUARE_SIZE * rc.length) - 30}, ${h - BOTTOM_SECTION_HEIGHT})`;
 			}, { immediate: true });
 
@@ -290,16 +270,16 @@
 				if (tippySingleton
 					&& e.target
 					&& (e.target as HTMLElement).classList.contains('vch__day__square')
-					&& (e.target as HTMLElement).dataset.weekIndex !== undefined
-					&& (e.target as HTMLElement).dataset.dayIndex !== undefined
+					&& (e.target as HTMLElement).dataset.sliceIndex !== undefined
+					&& (e.target as HTMLElement).dataset.itemIndex !== undefined
 				) {
 
-					const weekIndex = Number((e.target as HTMLElement).dataset.weekIndex),
-						  dayIndex  = Number((e.target as HTMLElement).dataset.dayIndex);
+					const sliceIndex = Number((e.target as HTMLElement).dataset.sliceIndex),
+						  itemIndex  = Number((e.target as HTMLElement).dataset.itemIndex);
 
-					if (!isNaN(weekIndex) && !isNaN(dayIndex)) {
+					if (!isNaN(sliceIndex) && !isNaN(itemIndex)) {
 
-						const tooltip = tooltipOptions(heatmap.value.calendar[ weekIndex ][ dayIndex ]);
+						const tooltip = tooltipOptions(heatmap.value.calendar[ sliceIndex ][ itemIndex ]);
 						if (tooltip) {
 
 							const instance = tippyInstances.get(e.target as HTMLElement);
@@ -322,7 +302,7 @@
 				SQUARE_BORDER_SIZE, SQUARE_SIZE, LEFT_SECTION_WIDTH, RIGHT_SECTION_WIDTH, TOP_SECTION_HEIGHT, BOTTOM_SECTION_HEIGHT,
 				svg, heatmap, now, width, height, viewbox, daysLabelWrapperTransform, monthsLabelWrapperTransform, yearWrapperTransform, legendWrapperTransform,
 				lo, legendViewbox, curRangeColor: rangeColor,
-				getWeekPosition, getDayPosition, getMonthLabelPosition, initTippyLazy
+				getSlicePosition, getItemPosition, getYearLabelPosition, initTippyLazy
 			};
 		}
 	});
