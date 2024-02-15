@@ -94,6 +94,12 @@ export class Heatmap {
 	set values(v: Value[]) {
 		this.max = Math.ceil((Math.max(...v.map(item => item.count)) / 5) * 4);
 		this._values = v;
+
+		const oldest = v.length > 0 ? Math.min(...v.map(v2 => this.parseDate(v2.date).getFullYear())) : new Date().getFullYear() - 10
+		this.startDate = new Date();
+		this.startDate.setFullYear(oldest);
+		this.numSlices = (this.endDate.getFullYear() - this.startDate.getFullYear() + 1) * 2;
+
 		this._firstFullWeekOfMonths = undefined;
 		this._yearsToHaveInLabels = undefined;
 		this._calendar = undefined;
@@ -155,13 +161,11 @@ export class Heatmap {
 
 			let year = this.startDate.getFullYear();
 			const lastYear = this.endDate.getFullYear();
-			console.log(year, lastYear);
 			while (year <= lastYear) {
 				this._yearsToHaveInLabels.push(year)
 				year++
 			}
 		}
-		console.log("Years to have in labels", this._yearsToHaveInLabels)
 		return this._yearsToHaveInLabels;
 	}
 

@@ -1,10 +1,10 @@
 var ae = Object.defineProperty;
 var re = (e, a, t) => a in e ? ae(e, a, { enumerable: !0, configurable: !0, writable: !0, value: t }) : e[a] = t;
 var i = (e, a, t) => (re(e, typeof a != "symbol" ? a + "" : a, t), t);
-import { defineComponent as ne, ref as c, toRefs as se, watch as m, toRef as H, nextTick as le, onMounted as ie, onBeforeUnmount as oe, openBlock as h, createElementBlock as _, normalizeClass as ue, createElementVNode as E, Fragment as I, renderList as p, toDisplayString as U, normalizeStyle as $, createCommentVNode as b, renderSlot as k } from "vue";
-import he, { createSingleton as _e } from "tippy.js";
+import { defineComponent as ne, ref as c, toRefs as se, watch as m, toRef as H, nextTick as le, onMounted as ie, onBeforeUnmount as oe, openBlock as u, createElementBlock as h, normalizeClass as ue, createElementVNode as g, Fragment as D, renderList as p, toDisplayString as U, normalizeStyle as k, createCommentVNode as w, renderSlot as b } from "vue";
+import he, { createSingleton as de } from "tippy.js";
 const L = class {
-  constructor(a, t, l, o) {
+  constructor(a, t, s, o) {
     i(this, "startDate");
     i(this, "endDate");
     i(this, "max");
@@ -15,16 +15,18 @@ const L = class {
     i(this, "_yearsToHaveInLabels");
     i(this, "_activities");
     i(this, "_calendar");
-    if (this.endDate = this.parseDate(a), this.max = l || Math.ceil(Math.max(...t.map((s) => s.count)) / 5 * 4), o)
+    if (this.endDate = this.parseDate(a), this.max = s || Math.ceil(Math.max(...t.map((l) => l.count)) / 5 * 4), o)
       this.startDate = new Date(o);
     else {
-      const s = t.length > 0 ? Math.min(...t.map((d) => this.parseDate(d.date).getFullYear())) : (/* @__PURE__ */ new Date()).getFullYear() - 10;
-      this.startDate = /* @__PURE__ */ new Date(), this.startDate.setFullYear(s);
+      const l = t.length > 0 ? Math.min(...t.map((_) => this.parseDate(_.date).getFullYear())) : (/* @__PURE__ */ new Date()).getFullYear() - 10;
+      this.startDate = /* @__PURE__ */ new Date(), this.startDate.setFullYear(l);
     }
     this.numSlices = (this.endDate.getFullYear() - this.startDate.getFullYear() + 1) * 2, this.numItems = L.MONTHS_IN_ROW, this._values = t;
   }
   set values(a) {
-    this.max = Math.ceil(Math.max(...a.map((t) => t.count)) / 5 * 4), this._values = a, this._firstFullWeekOfMonths = void 0, this._yearsToHaveInLabels = void 0, this._calendar = void 0, this._activities = void 0;
+    this.max = Math.ceil(Math.max(...a.map((s) => s.count)) / 5 * 4), this._values = a;
+    const t = a.length > 0 ? Math.min(...a.map((s) => this.parseDate(s.date).getFullYear())) : (/* @__PURE__ */ new Date()).getFullYear() - 10;
+    this.startDate = /* @__PURE__ */ new Date(), this.startDate.setFullYear(t), this.numSlices = (this.endDate.getFullYear() - this.startDate.getFullYear() + 1) * 2, this._firstFullWeekOfMonths = void 0, this._yearsToHaveInLabels = void 0, this._calendar = void 0, this._activities = void 0;
   }
   get values() {
     return this._values;
@@ -33,11 +35,11 @@ const L = class {
     var a;
     if (!this._activities) {
       this._activities = /* @__PURE__ */ new Map();
-      for (let t = 0, l = this.values.length; t < l; t++) {
-        const o = this.keyMonthParser(this.values[t].date), s = (((a = this._activities.get(o)) == null ? void 0 : a.count) || 0) + this.values[t].count;
+      for (let t = 0, s = this.values.length; t < s; t++) {
+        const o = this.keyMonthParser(this.values[t].date), l = (((a = this._activities.get(o)) == null ? void 0 : a.count) || 0) + this.values[t].count;
         this._activities.set(o, {
-          count: s,
-          colorIndex: this.getColorIndex(s)
+          count: l,
+          colorIndex: this.getColorIndex(l)
         });
       }
     }
@@ -47,14 +49,14 @@ const L = class {
     if (!this._calendar) {
       let a = new Date(this.startDate.getFullYear(), 0, 1);
       this._calendar = new Array(this.numSlices);
-      for (let t = 0, l = this._calendar.length; t < l; t++) {
+      for (let t = 0, s = this._calendar.length; t < s; t++) {
         this._calendar[t] = new Array(this.numItems);
         for (let o = 0; o < this.numItems; o++) {
-          const s = this.activities.get(this.keyMonthParser(a));
+          const l = this.activities.get(this.keyMonthParser(a));
           this._calendar[t][o] = {
             date: new Date(a.valueOf()),
-            count: s ? s.count : void 0,
-            colorIndex: s ? s.colorIndex : 0
+            count: l ? l.count : void 0,
+            colorIndex: l ? l.colorIndex : 0
           }, a.setMonth(a.getMonth() + 1);
         }
       }
@@ -66,18 +68,18 @@ const L = class {
       this._yearsToHaveInLabels = [];
       let a = this.startDate.getFullYear();
       const t = this.endDate.getFullYear();
-      for (console.log(a, t); a <= t; )
+      for (; a <= t; )
         this._yearsToHaveInLabels.push(a), a++;
     }
-    return console.log("Years to have in labels", this._yearsToHaveInLabels), this._yearsToHaveInLabels;
+    return this._yearsToHaveInLabels;
   }
   get firstFullWeekOfMonths() {
     if (!this._firstFullWeekOfMonths) {
       const a = this.calendar;
       this._firstFullWeekOfMonths = [];
-      for (let t = 1, l = a.length; t < l; t++) {
-        const o = a[t - 1][0].date, s = a[t][0].date;
-        (o.getFullYear() < s.getFullYear() || o.getMonth() < s.getMonth()) && this._firstFullWeekOfMonths.push({ value: s.getMonth(), index: t });
+      for (let t = 1, s = a.length; t < s; t++) {
+        const o = a[t - 1][0].date, l = a[t][0].date;
+        (o.getFullYear() < l.getFullYear() || o.getMonth() < l.getMonth()) && this._firstFullWeekOfMonths.push({ value: l.getMonth(), index: t });
       }
     }
     return this._firstFullWeekOfMonths;
@@ -95,8 +97,8 @@ const L = class {
     return L.DAYS_IN_ONE_YEAR + 1 + this.getCountEmptyDaysAtStart() + this.getCountEmptyDaysAtEnd();
   }
   shiftDate(a, t) {
-    const l = new Date(a);
-    return l.setDate(l.getDate() + t), l;
+    const s = new Date(a);
+    return s.setDate(s.getDate() + t), s;
   }
   parseDate(a) {
     return a instanceof Date ? a : new Date(a);
@@ -124,7 +126,7 @@ i(n, "DEFAULT_LOCALE", {
   less: "Less",
   more: "More"
 }), i(n, "DEFAULT_TOOLTIP_UNIT", "contributions"), i(n, "DAYS_IN_ONE_YEAR", 365), i(n, "DAYS_IN_WEEK", 7), i(n, "MONTHS_IN_ONE_YEAR", 12), i(n, "MONTHS_IN_ROW", 6), i(n, "SQUARE_SIZE", 10);
-const de = /* @__PURE__ */ ne({
+const _e = /* @__PURE__ */ ne({
   name: "CalendarHeatmap",
   props: {
     endDate: {
@@ -133,9 +135,7 @@ const de = /* @__PURE__ */ ne({
     max: {
       type: Number
     },
-    startDate: {
-      type: Number
-    },
+    startDate: {},
     rangeColor: {
       type: Array
     },
@@ -173,10 +173,10 @@ const de = /* @__PURE__ */ ne({
   },
   emits: ["itemClick"],
   setup(e) {
-    const a = n.SQUARE_SIZE / 5, t = n.SQUARE_SIZE + a, l = Math.ceil(n.SQUARE_SIZE * 2.5), o = t * 3, s = n.SQUARE_SIZE + n.SQUARE_SIZE / 2, d = n.SQUARE_SIZE + n.SQUARE_SIZE / 2, u = `translate(${l}, ${s})`, R = c(null), D = c(/* @__PURE__ */ new Date()), g = c(new n(e.endDate, e.values, e.max)), A = c(0), T = c(0), Q = c("0 0 0 0"), Z = c("0 0 0 0"), w = c(""), N = c(""), W = c(""), y = c({}), O = c(e.rangeColor || (e.darkMode ? n.DEFAULT_RANGE_COLOR_DARK : n.DEFAULT_RANGE_COLOR_LIGHT)), { values: G, tooltipUnit: z, tooltipFormatter: K, noDataText: V, max: q, vertical: Y, locale: J } = se(e), v = /* @__PURE__ */ new Map();
+    const a = n.SQUARE_SIZE / 5, t = n.SQUARE_SIZE + a, s = Math.ceil(n.SQUARE_SIZE * 2.5), o = t * 3, l = n.SQUARE_SIZE + n.SQUARE_SIZE / 2, _ = n.SQUARE_SIZE + n.SQUARE_SIZE / 2, d = `translate(${s}, ${l})`, I = c(null), R = c(/* @__PURE__ */ new Date()), E = c(new n(e.endDate, e.values, e.max)), A = c(0), T = c(0), Q = c("0 0 0 0"), Z = c("0 0 0 0"), F = c(""), N = c(""), Y = c(""), y = c({}), O = c(e.rangeColor || (e.darkMode ? n.DEFAULT_RANGE_COLOR_DARK : n.DEFAULT_RANGE_COLOR_LIGHT)), { values: G, tooltipUnit: z, tooltipFormatter: K, noDataText: V, max: q, vertical: W, locale: J } = se(e), v = /* @__PURE__ */ new Map();
     let S;
     function B() {
-      v.clear(), S ? S.setInstances(Array.from(v.values())) : S = _e(Array.from(v.values()), {
+      v.clear(), S ? S.setInstances(Array.from(v.values())) : S = de(Array.from(v.values()), {
         overrides: [],
         moveTransition: "transform 0.1s ease-out",
         allowHTML: !0
@@ -191,24 +191,24 @@ const de = /* @__PURE__ */ ne({
       }
     }
     function x(r) {
-      return e.vertical ? `translate(0, ${t * g.value.numSlices - (r + 1) * t})` : `translate(${r * t}, 0)`;
+      return e.vertical ? `translate(0, ${t * E.value.numSlices - (r + 1) * t})` : `translate(${r * t}, 0)`;
     }
     function X(r) {
       return e.vertical ? `translate(${r * t}, 0)` : `translate(0, ${r * t})`;
     }
     function ee(r) {
-      return e.vertical ? { x: 0, y: t * g.value.numSlices - t * (r * 2) - t / 4 } : { x: t * r * 2, y: t - a };
+      return e.vertical ? { x: 0, y: t * E.value.numSlices - t * (r * 2) - t / 4 } : { x: t * r * 2, y: t - a };
     }
     m([H(e, "rangeColor"), H(e, "darkMode")], ([r, f]) => {
       O.value = r || (f ? n.DEFAULT_RANGE_COLOR_DARK : n.DEFAULT_RANGE_COLOR_LIGHT);
-    }), m(Y, (r) => {
-      r ? (A.value = l + t * n.MONTHS_IN_ROW + o, T.value = s + t * g.value.numSlices + a, w.value = `translate(${l}, 0)`, N.value = `translate(0, ${s})`) : (A.value = l + t * g.value.numSlices + a, T.value = s + t * n.MONTHS_IN_ROW, w.value = `translate(0, ${s})`, N.value = `translate(${l}, 0)`);
+    }), m(W, (r) => {
+      r ? (A.value = s + t * n.MONTHS_IN_ROW + o, T.value = l + t * E.value.numSlices + a, F.value = `translate(${s}, 0)`, N.value = `translate(0, ${l})`) : (A.value = s + t * E.value.numSlices + a, T.value = l + t * n.MONTHS_IN_ROW, F.value = `translate(0, ${l})`, N.value = `translate(${s}, 0)`);
     }, { immediate: !0 }), m([A, T], ([r, f]) => Q.value = ` 0 0 ${r} ${f}`, { immediate: !0 }), m([A, T, O], ([r, f, M]) => {
-      W.value = Y.value ? `translate(${l + t * n.MONTHS_IN_ROW}, ${s})` : `translate(${r - t * M.length - 30}, ${f - d})`;
+      Y.value = W.value ? `translate(${s + t * n.MONTHS_IN_ROW}, ${l})` : `translate(${r - t * M.length - 30}, ${f - _})`;
     }, { immediate: !0 }), m(J, (r) => y.value = r ? { ...n.DEFAULT_LOCALE, ...r } : n.DEFAULT_LOCALE, { immediate: !0 }), m(O, (r) => Z.value = `0 0 ${n.SQUARE_SIZE * (r.length + 1)} ${n.SQUARE_SIZE}`, { immediate: !0 }), m(
       [G, z, K, V, q, O],
       () => {
-        g.value = new n(e.endDate, e.values, e.max), v.forEach((r) => r.destroy()), le(B);
+        E.value = new n(e.endDate, e.values, e.max), v.forEach((r) => r.destroy()), le(B);
       }
     ), ie(B), oe(() => {
       S == null || S.destroy(), v.forEach((r) => r.destroy());
@@ -217,10 +217,10 @@ const de = /* @__PURE__ */ ne({
       if (S && r.target && r.target.classList.contains("vch__day__square") && r.target.dataset.sliceIndex !== void 0 && r.target.dataset.itemIndex !== void 0) {
         const f = Number(r.target.dataset.sliceIndex), M = Number(r.target.dataset.itemIndex);
         if (!isNaN(f) && !isNaN(M)) {
-          const C = j(g.value.calendar[f][M]);
+          const C = j(E.value.calendar[f][M]);
           if (C) {
-            const F = v.get(r.target);
-            F ? F.setContent(C) : F || (v.set(r.target, he(r.target, { content: C })), S.setInstances(Array.from(v.values())));
+            const $ = v.get(r.target);
+            $ ? $.setContent(C) : $ || (v.set(r.target, he(r.target, { content: C })), S.setInstances(Array.from(v.values())));
           }
         }
       }
@@ -228,20 +228,20 @@ const de = /* @__PURE__ */ ne({
     return {
       SQUARE_BORDER_SIZE: a,
       SQUARE_SIZE: t,
-      LEFT_SECTION_WIDTH: l,
+      LEFT_SECTION_WIDTH: s,
       RIGHT_SECTION_WIDTH: o,
-      TOP_SECTION_HEIGHT: s,
-      BOTTOM_SECTION_HEIGHT: d,
-      svg: R,
-      heatmap: g,
-      now: D,
+      TOP_SECTION_HEIGHT: l,
+      BOTTOM_SECTION_HEIGHT: _,
+      svg: I,
+      heatmap: E,
+      now: R,
       width: A,
       height: T,
       viewbox: Q,
-      daysLabelWrapperTransform: w,
+      daysLabelWrapperTransform: F,
       monthsLabelWrapperTransform: N,
-      yearWrapperTransform: u,
-      legendWrapperTransform: W,
+      yearWrapperTransform: d,
+      legendWrapperTransform: Y,
       lo: y,
       legendViewbox: Z,
       curRangeColor: O,
@@ -254,125 +254,128 @@ const de = /* @__PURE__ */ ne({
 });
 const ce = (e, a) => {
   const t = e.__vccOpts || e;
-  for (const [l, o] of a)
-    t[l] = o;
+  for (const [s, o] of a)
+    t[s] = o;
   return t;
-}, Ee = ["viewBox"], ge = ["transform"], ve = ["x", "y"], Se = ["transform"], fe = ["x"], me = ["rx", "ry", "width", "height", "x", "y"], ye = ["x", "y"], Ie = ["transform"], Re = ["transform"], De = ["rx", "ry", "transform", "width", "height", "data-slice-index", "data-item-index", "onClick"], Ae = { class: "vch__legend" }, Te = { class: "vch__legend-left" }, Oe = { class: "vch__legend-right" }, pe = { class: "vch__legend" }, Ue = ["viewBox", "height"], Le = { class: "vch__legend__wrapper" }, Me = ["rx", "ry", "width", "height", "x"];
-function we(e, a, t, l, o, s) {
-  return h(), _("div", {
+}, ge = ["viewBox"], Ee = ["transform"], ve = ["x", "y"], Se = ["transform"], fe = ["x"], me = ["rx", "ry", "width", "height", "x", "y"], ye = ["x", "y"], De = ["transform"], Ie = ["transform"], Re = ["rx", "ry", "transform", "width", "height", "data-slice-index", "data-item-index", "onClick"], Ae = {
+  key: 0,
+  class: "vch__legend"
+}, Te = { class: "vch__legend-left" }, Oe = { class: "vch__legend-right" }, pe = { class: "vch__legend" }, Ue = ["viewBox", "height"], Le = { class: "vch__legend__wrapper" }, Me = ["rx", "ry", "width", "height", "x"];
+function we(e, a, t, s, o, l) {
+  return u(), h("div", {
     class: ue({ vch__container: !0, "dark-mode": e.darkMode })
   }, [
-    (h(), _("svg", {
+    (u(), h("svg", {
       class: "vch__wrapper",
       ref: "svg",
       viewBox: e.viewbox
     }, [
-      E("g", {
+      g("g", {
         class: "vch__months__labels__wrapper",
         transform: e.monthsLabelWrapperTransform
       }, [
-        (h(!0), _(I, null, p(e.heatmap.yearsToHaveInlabels, (d, u) => (h(), _("text", {
+        (u(!0), h(D, null, p(e.heatmap.yearsToHaveInlabels, (_, d) => (u(), h("text", {
           class: "vch__month__label",
-          key: u,
-          x: e.getYearLabelPosition(u).x,
-          y: e.getYearLabelPosition(u).y
-        }, U(d), 9, ve))), 128))
-      ], 8, ge),
-      e.vertical ? (h(), _("g", {
+          key: d,
+          x: e.getYearLabelPosition(d).x,
+          y: e.getYearLabelPosition(d).y
+        }, U(_), 9, ve))), 128))
+      ], 8, Ee),
+      e.vertical ? (u(), h("g", {
         key: 0,
         class: "vch__legend__wrapper",
         transform: e.legendWrapperTransform
       }, [
-        E("text", {
+        g("text", {
           x: e.SQUARE_SIZE * 1.25,
           y: "8"
         }, U(e.lo.less), 9, fe),
-        (h(!0), _(I, null, p(e.curRangeColor, (d, u) => (h(), _("rect", {
-          key: u,
+        (u(!0), h(D, null, p(e.curRangeColor, (_, d) => (u(), h("rect", {
+          key: d,
           rx: e.round,
           ry: e.round,
-          style: $({ fill: d }),
+          style: k({ fill: _ }),
           width: e.SQUARE_SIZE - e.SQUARE_BORDER_SIZE,
           height: e.SQUARE_SIZE - e.SQUARE_BORDER_SIZE,
           x: e.SQUARE_SIZE * 1.75,
-          y: e.SQUARE_SIZE * (u + 1)
+          y: e.SQUARE_SIZE * (d + 1)
         }, null, 12, me))), 128)),
-        E("text", {
+        g("text", {
           x: e.SQUARE_SIZE * 1.25,
           y: e.SQUARE_SIZE * (e.curRangeColor.length + 2) - e.SQUARE_BORDER_SIZE
         }, U(e.lo.more), 9, ye)
-      ], 8, Se)) : b("", !0),
-      E("g", {
+      ], 8, Se)) : w("", !0),
+      g("g", {
         class: "vch__year__wrapper",
         transform: e.yearWrapperTransform,
-        onMouseover: a[0] || (a[0] = (...d) => e.initTippyLazy && e.initTippyLazy(...d))
+        onMouseover: a[0] || (a[0] = (..._) => e.initTippyLazy && e.initTippyLazy(..._))
       }, [
-        (h(!0), _(I, null, p(e.heatmap.calendar, (d, u) => (h(), _("g", {
+        (u(!0), h(D, null, p(e.heatmap.calendar, (_, d) => (u(), h("g", {
           class: "vch__slice__wrapper",
-          key: u,
-          transform: e.getSlicePosition(u)
+          key: d,
+          transform: e.getSlicePosition(d)
         }, [
-          (h(!0), _(I, null, p(d, (R, D) => (h(), _(I, { key: D }, [
-            R.date < e.now ? (h(), _("rect", {
+          (u(!0), h(D, null, p(_, (I, R) => (u(), h(D, { key: R }, [
+            I.date < e.now ? (u(), h("rect", {
               key: 0,
               class: "vch__day__square",
               rx: e.round,
               ry: e.round,
-              transform: e.getItemPosition(D),
+              transform: e.getItemPosition(R),
               width: e.SQUARE_SIZE - e.SQUARE_BORDER_SIZE,
               height: e.SQUARE_SIZE - e.SQUARE_BORDER_SIZE,
-              style: $({ fill: e.curRangeColor[R.colorIndex] }),
-              "data-slice-index": u,
-              "data-item-index": D,
-              onClick: (g) => e.$emit("itemClick", R)
-            }, null, 12, De)) : b("", !0)
+              style: k({ fill: e.curRangeColor[I.colorIndex] }),
+              "data-slice-index": d,
+              "data-item-index": R,
+              onClick: (E) => e.$emit("itemClick", I)
+            }, null, 12, Re)) : w("", !0)
           ], 64))), 128))
-        ], 8, Re))), 128))
-      ], 40, Ie)
-    ], 8, Ee)),
-    E("div", Ae, [
-      k(e.$slots, "legend", {}, () => [
-        E("div", Te, [
-          k(e.$slots, "vch__legend-left")
+        ], 8, Ie))), 128))
+      ], 40, De)
+    ], 8, ge)),
+    e.vertical ? w("", !0) : (u(), h("div", Ae, [
+      b(e.$slots, "legend", {}, () => [
+        g("div", Te, [
+          b(e.$slots, "vch__legend-left")
         ]),
-        E("div", Oe, [
-          k(e.$slots, "legend-right", {}, () => [
-            E("div", pe, [
-              E("div", null, U(e.lo.less), 1),
-              e.vertical ? b("", !0) : (h(), _("svg", {
+        g("div", Oe, [
+          b(e.$slots, "legend-right", {}, () => [
+            g("div", pe, [
+              g("div", null, U(e.lo.less), 1),
+              e.vertical ? w("", !0) : (u(), h("svg", {
                 key: 0,
                 class: "vch__external-legend-wrapper",
                 viewBox: e.legendViewbox,
                 height: e.SQUARE_SIZE - e.SQUARE_BORDER_SIZE
               }, [
-                E("g", Le, [
-                  (h(!0), _(I, null, p(e.curRangeColor, (d, u) => (h(), _("rect", {
-                    key: u,
+                g("g", Le, [
+                  (u(!0), h(D, null, p(e.curRangeColor, (_, d) => (u(), h("rect", {
+                    key: d,
                     rx: e.round,
                     ry: e.round,
-                    style: $({ fill: d }),
+                    style: k({ fill: _ }),
                     width: e.SQUARE_SIZE - e.SQUARE_BORDER_SIZE,
                     height: e.SQUARE_SIZE - e.SQUARE_BORDER_SIZE,
-                    x: e.SQUARE_SIZE * u
+                    x: e.SQUARE_SIZE * d
                   }, null, 12, Me))), 128))
                 ])
               ], 8, Ue)),
-              E("div", null, U(e.lo.more), 1)
+              g("div", null, U(e.lo.more), 1)
             ])
           ])
         ])
       ])
-    ])
+    ]))
   ], 2);
 }
-const P = /* @__PURE__ */ ce(de, [["render", we]]);
-function Ne(e) {
+const P = /* @__PURE__ */ ce(_e, [["render", we]]);
+function Fe(e) {
   e.component(P.name, P);
 }
-const be = { install: Ne };
+const ke = { install: Fe };
 export {
   P as CalendarHeatmap,
   n as Heatmap,
-  be as default
+  ke as default
 };
 //# sourceMappingURL=vue3-calendar-heatmap.es.js.map

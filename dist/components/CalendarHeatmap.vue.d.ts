@@ -7,9 +7,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     max: {
         type: NumberConstructor;
     };
-    startDate: {
-        type: NumberConstructor;
-    };
+    startDate: {};
     rangeColor: {
         type: PropType<string[]>;
     };
@@ -419,9 +417,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     max: {
         type: NumberConstructor;
     };
-    startDate: {
-        type: NumberConstructor;
-    };
+    startDate: {};
     rangeColor: {
         type: PropType<string[]>;
     };

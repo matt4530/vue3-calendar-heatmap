@@ -60,7 +60,7 @@
 				</g>
 			</g>
 		</svg>
-		<div class="vch__legend">
+		<div v-if="!vertical" class="vch__legend">
 			<slot name="legend">
 				<div class="vch__legend-left">
 					<slot name="vch__legend-left"></slot>
@@ -109,7 +109,6 @@
 				type: Number
 			},
 			startDate: {
-				type:Number
 			},
 			rangeColor      : {
 				type: Array as PropType<string[]>
