@@ -108,6 +108,9 @@
 			max             : {
 				type: Number
 			},
+			startDate: {
+				type:Number
+			},
 			rangeColor      : {
 				type: Array as PropType<string[]>
 			},

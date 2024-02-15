@@ -48,7 +48,7 @@ export class Heatmap {
 	static readonly DEFAULT_LOCALE: Locale = {
 		months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
 		days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-		on: 'on',
+		on: 'in',
 		less: 'Less',
 		more: 'More'
 	};
@@ -74,7 +74,7 @@ export class Heatmap {
 	constructor(endDate: Date | string, values: Value[], max?: number, startDate?: Date | string) {
 		this.endDate = this.parseDate(endDate);
 
-		this.max = max || Math.ceil((Math.max(...values.map(day => day.count)) / 5) * 4);
+		this.max = max || Math.ceil((Math.max(...values.map(item => item.count)) / 5) * 4);
 
 		if (startDate)
 			this.startDate = new Date(startDate);
@@ -92,7 +92,7 @@ export class Heatmap {
 	}
 
 	set values(v: Value[]) {
-		this.max = Math.ceil((Math.max(...v.map(day => day.count)) / 5) * 4);
+		this.max = Math.ceil((Math.max(...v.map(item => item.count)) / 5) * 4);
 		this._values = v;
 		this._firstFullWeekOfMonths = undefined;
 		this._yearsToHaveInLabels = undefined;
@@ -146,7 +146,6 @@ export class Heatmap {
 				}
 			}
 		}
-		console.log(this._calendar)
 		return this._calendar;
 	}
 
