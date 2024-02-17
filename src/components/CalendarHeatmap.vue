@@ -227,11 +227,11 @@
 			function resize() {
 				if (vertical.value) {
 					width.value                       = LEFT_SECTION_WIDTH + (SQUARE_SIZE * Heatmap.MONTHS_IN_ROW) + RIGHT_SECTION_WIDTH;
-					height.value                      = TOP_SECTION_HEIGHT + (SQUARE_SIZE * heatmap.value.numSlices) + SQUARE_BORDER_SIZE;
+					height.value                      = Math.max(TOP_SECTION_HEIGHT + (SQUARE_SIZE * heatmap.value.numSlices) + SQUARE_BORDER_SIZE, 119);
 					daysLabelWrapperTransform.value   = `translate(${LEFT_SECTION_WIDTH}, 0)`;
 					monthsLabelWrapperTransform.value = `translate(0, ${TOP_SECTION_HEIGHT})`;
 				} else {
-					width.value                       = LEFT_SECTION_WIDTH + (SQUARE_SIZE * heatmap.value.numSlices) + SQUARE_BORDER_SIZE;
+					width.value                       = Math.max(LEFT_SECTION_WIDTH + (SQUARE_SIZE * heatmap.value.numSlices) + SQUARE_BORDER_SIZE, 179);
 					height.value                      = TOP_SECTION_HEIGHT + (SQUARE_SIZE * Heatmap.MONTHS_IN_ROW);
 					daysLabelWrapperTransform.value   = `translate(0, ${TOP_SECTION_HEIGHT})`;
 					monthsLabelWrapperTransform.value = `translate(${LEFT_SECTION_WIDTH}, 0)`;
@@ -247,14 +247,6 @@
 			}, { immediate: true });
 
 			watch([ width, height ], ([ w, h ]) => {
-				if(vertical.value) {
-					if(h < 119)
-						h = 119;
-				}
-				else {
-					if(w < 175)
-						w = 175;
-				}
 				viewbox.value = ` 0 0 ${w} ${h}`
 			}, { immediate: true });
 			watch([ width, height, rangeColor ], ([ w, h, rc ]) => {
