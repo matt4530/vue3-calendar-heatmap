@@ -59,6 +59,8 @@ export class Heatmap {
 	static readonly MONTHS_IN_ROW = 6;
 	static readonly SQUARE_SIZE = 10;
 
+	static DEFAULT_HISTORY_IN_YEARS = 5; // 5 years
+
 	startDate: Date;
 	endDate: Date;
 	max: number;
@@ -79,7 +81,7 @@ export class Heatmap {
 		if (startDate)
 			this.startDate = new Date(startDate);
 		else {
-			const oldest = values.length > 0 ? Math.min(...values.map(v => this.parseDate(v.date).getFullYear())) : new Date().getFullYear() - 10
+			const oldest = values.length > 0 ? Math.min(...values.map(v => this.parseDate(v.date).getFullYear())) : new Date().getFullYear() - Heatmap.DEFAULT_HISTORY_IN_YEARS
 			this.startDate = new Date();
 			this.startDate.setFullYear(oldest);
 		}
@@ -95,7 +97,7 @@ export class Heatmap {
 		this.max = Math.ceil((Math.max(...v.map(item => item.count)) / 5) * 4);
 		this._values = v;
 
-		const oldest = v.length > 0 ? Math.min(...v.map(v2 => this.parseDate(v2.date).getFullYear())) : new Date().getFullYear() - 10
+		const oldest = v.length > 0 ? Math.min(...v.map(v2 => this.parseDate(v2.date).getFullYear())) : new Date().getFullYear() - Heatmap.DEFAULT_HISTORY_IN_YEARS
 		this.startDate = new Date();
 		this.startDate.setFullYear(oldest);
 		this.numSlices = (this.endDate.getFullYear() - this.startDate.getFullYear() + 1) * 2;

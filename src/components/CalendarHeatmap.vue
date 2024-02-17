@@ -224,12 +224,8 @@
 				return { x: SQUARE_SIZE * yearIndex * 2, y: SQUARE_SIZE - SQUARE_BORDER_SIZE };
 			}
 
-			watch([ toRef(props, 'rangeColor'), toRef(props, 'darkMode') ], ([ rc, dm ]) => {
-				rangeColor.value = rc || (dm ? Heatmap.DEFAULT_RANGE_COLOR_DARK : Heatmap.DEFAULT_RANGE_COLOR_LIGHT);
-			});
-
-			watch(vertical, v => {
-				if (v) {
+			function resize() {
+				if (vertical.value) {
 					width.value                       = LEFT_SECTION_WIDTH + (SQUARE_SIZE * Heatmap.MONTHS_IN_ROW) + RIGHT_SECTION_WIDTH;
 					height.value                      = TOP_SECTION_HEIGHT + (SQUARE_SIZE * heatmap.value.numSlices) + SQUARE_BORDER_SIZE;
 					daysLabelWrapperTransform.value   = `translate(${LEFT_SECTION_WIDTH}, 0)`;
@@ -240,9 +236,27 @@
 					daysLabelWrapperTransform.value   = `translate(0, ${TOP_SECTION_HEIGHT})`;
 					monthsLabelWrapperTransform.value = `translate(${LEFT_SECTION_WIDTH}, 0)`;
 				}
+			}
+
+			watch([ toRef(props, 'rangeColor'), toRef(props, 'darkMode') ], ([ rc, dm ]) => {
+				rangeColor.value = rc || (dm ? Heatmap.DEFAULT_RANGE_COLOR_DARK : Heatmap.DEFAULT_RANGE_COLOR_LIGHT);
+			});
+
+			watch(vertical, v => {
+				resize();
 			}, { immediate: true });
 
-			watch([ width, height ], ([ w, h ]) => (viewbox.value = ` 0 0 ${w} ${h}`), { immediate: true });
+			watch([ width, height ], ([ w, h ]) => {
+				if(vertical.value) {
+					if(h < 119)
+						h = 119;
+				}
+				else {
+					if(w < 175)
+						w = 175;
+				}
+				viewbox.value = ` 0 0 ${w} ${h}`
+			}, { immediate: true });
 			watch([ width, height, rangeColor ], ([ w, h, rc ]) => {
 				legendWrapperTransform.value = vertical.value
 					? `translate(${LEFT_SECTION_WIDTH + (SQUARE_SIZE * Heatmap.MONTHS_IN_ROW)}, ${TOP_SECTION_HEIGHT})`
@@ -258,8 +272,9 @@
 					heatmap.value = new Heatmap(props.endDate as Date, props.values, props.max);
 					tippyInstances.forEach((item) => item.destroy());
 					nextTick(initTippy);
+					resize();
 				}
-			);
+				, {deep:true});
 
 			onMounted(initTippy);
 			onBeforeUnmount(() => {

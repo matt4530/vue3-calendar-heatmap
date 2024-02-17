@@ -35,6 +35,7 @@ export declare class Heatmap {
     static readonly MONTHS_IN_ONE_YEAR = 12;
     static readonly MONTHS_IN_ROW = 6;
     static readonly SQUARE_SIZE = 10;
+    static DEFAULT_HISTORY_IN_YEARS: number;
     startDate: Date;
     endDate: Date;
     max: number;
